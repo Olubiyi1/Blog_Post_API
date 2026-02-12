@@ -7,9 +7,14 @@ const validate = (schema) =>(req,res,next)=>{
     });
 
     if(error){
-        return ResponseHandler.badRequest(res,"")
+       const errors = error.details.map(detail => ({
+        field:detail.path.join("."),
+        message:detail.message
+       }))
+        return ResponseHandler.badRequest(res,"Validation error",errors)
     }
     req.body = value
     next()
 };
+
 export default validate;

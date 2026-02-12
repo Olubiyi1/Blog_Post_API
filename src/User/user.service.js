@@ -1,4 +1,4 @@
-import userModel from "../models/user.model.js";
+import userSchema from "../User/user.model.js"
 import AppError from "../errorHandlers/appError.js";
 import hashPassword from "../guards/hashPassword.js";
 import createJwt from "../guards/createJwt.js";
@@ -11,14 +11,14 @@ class UserService {
   static registerUser = async (data) => {
     const { firstName, lastName, email, password } = data;
 
-    const existingUser = await userModel.findOne({ email });
+    const existingUser = await userSchema.findOne({ email });
     if (existingUser) {
       throw new AppError("User already exists", 400);
     }
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await userModel.create({
+    const user = await userSchema.create({
       firstName,
       lastName,
       email,
@@ -37,12 +37,21 @@ class UserService {
   static loginUser = async (data) => {
     const { email, password } = data;
 
-    const user = await userModel.findOne({ email });
+    console.log('attempted loging with', {email,password});
+    
+
+    const user = await userSchema.findOne({ email });
+
+    console.log("user found", user?"yes":"no");
+    
     if (!user) {
       throw new AppError("Invalid email or password", 401);
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
+
+    console.log("is password same", isPasswordValid);
+    
     if (!isPasswordValid) {
       throw new AppError("Invalid email or password", 401);
     }

@@ -4,6 +4,7 @@ import config from "./config.js";
 const connectDb= async()=>{
     try{
         const connect = await mongoose.connect(config.mongo_uri);
+        // const connect = await mongoose.connect(config.test_db);
         console.log(`Mongo connected:${connect.connection.host}`);
         
         // mongoose event listener

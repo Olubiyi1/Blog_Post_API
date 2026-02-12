@@ -1,5 +1,5 @@
-import UserService from "./user.service";
-import ResponseHandler from "../utils/responseHandler";
+import UserService from "./user.service.js";
+import ResponseHandler from "../utils/responseHandler.js";
 
 class UserController {
   // create user
@@ -12,7 +12,7 @@ class UserController {
     }
   };
 
-  //   login user
+  //   login user 
 
   static userLogin = async (req, res, next) => {
     try {
@@ -24,4 +24,4 @@ class UserController {
     }
   };
 }
-
+export default UserController;
