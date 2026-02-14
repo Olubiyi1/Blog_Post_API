@@ -6,7 +6,13 @@ import validate from "../middlewares/validationMiddleware.js";
 
 const blogRouter = express.Router()
 
-blogRouter.post("/",authMiddleware,validate(BlogValidation.createBlogSchema),BlogController.createBlog)
+blogRouter.get("/",BlogController.getAllBlogs)
+
+// all protected routes
+blogRouter.use(authMiddleware)
+blogRouter.get("/my-blogs", BlogController.getMyBlogs);
+blogRouter.post("/",validate(BlogValidation.createBlogSchema),BlogController.createBlog)
+blogRouter.patch("/:id",validate(BlogValidation.updateBlogSchema),BlogController.updateBlog)
 
 
 export default blogRouter;

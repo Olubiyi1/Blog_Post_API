@@ -15,7 +15,7 @@ app.get("/homepage",(req,res)=>{
     })
 })
 app.use("/api/users",userRouter)
-app.use(/api/blog,blogRouter)
+app.use("/api/blogs",blogRouter)
 app.use(notFoundHandler)
 app.use(globalErrorHandler)
 export default app;

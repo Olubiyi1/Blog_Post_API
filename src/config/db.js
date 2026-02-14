@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import config from "./config.js";
+import ResponseHandler from "../utils/responseHandler.js";
 
 const connectDb= async()=>{
     try{
@@ -9,7 +10,9 @@ const connectDb= async()=>{
         
         // mongoose event listener
         mongoose.connection.on("error",(err)=>{
-            console.error("Error connectin to db",err);
+            // return ResponseHandler.error("Error connecting db")
+            console.error("Error connectin to db:",err);
+            
             
         })
         mongoose.connection.on("disconnected",()=>{
