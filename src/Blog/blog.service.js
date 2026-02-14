@@ -1,5 +1,8 @@
 import AppError from "../errorHandlers/appError.js";
 import blogSchema from "./blog.model.js";
+import userschema from "../User/user.model.js"
+import mongoose from "mongoose";
+
 
 // simple reading time calculator
 const calculateReadingTime = (text) => {
@@ -12,6 +15,7 @@ const calculateReadingTime = (text) => {
 class BlogService {
     // create blogs
   static createBlog = async (blogData, userId) => {
+
     // attach author
     blogData.author = userId;
 
@@ -26,6 +30,12 @@ class BlogService {
 
 //   update blogs
   static updateBlog = async (blogId, userId, updateData) => {
+
+    //validates the Id's
+    if(!mongoose.Types.ObjectId.isValid(blogId)){
+      throw new AppError("Invalid blog ID",400)
+    }
+
     const blog = await blogSchema.findById(blogId);
     if (!blog) {
       throw new AppError("Blog not found", 404);
@@ -85,7 +95,7 @@ class BlogService {
   };
 
 //   get all published blogs
-  static getAllPublishedBlogs = async () => {
+  static getAllPublishedBlogs = async (query) => {
     let {
       page = 1,
       limit = 20,
@@ -101,7 +111,7 @@ class BlogService {
     limit = Number(limit);
 
     // calculate number of dic to skip
-    skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
     const filter = {state:"published"}
 
@@ -112,8 +122,15 @@ class BlogService {
     }
 
     if (author) {
-      // Search by author name using populate
-      filter["author.name"] = { $regex: author, $options: "i" };
+      // Search by author mathching with name
+
+      const authors = await userschema.find({
+        name:{$regex:author,$options:"i"}
+      }).select("_id")
+
+      const authorIds = authors.map(a => a._id)
+      filter.author = { $in:authorIds}
+      
     }
 
      if (tags.length) {
@@ -137,8 +154,8 @@ class BlogService {
 
     // Fetch only published blogs and sort by latest published
     const blogs = await blogSchema
-      .find({ state: "published" })
-      .sort({ createdAt: -1 })
+      .find(filter)
+      .sort(sortOptions)
       .limit(limit)
       .skip(skip)
       .populate("author", "name email");
@@ -150,6 +167,30 @@ class BlogService {
       blogs,
     };
   };
+
+  static deleteBlog = async(id)=>{
+
+    // validate id format
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid blog ID",400)};
+
+   const blog = await blogSchema.findById(id)
+    if(!blog){
+      return new AppError("Blog not found",404)
+    }
+
+    // author can only their own post
+    if(blog.author.toString() !== userId.toString()){
+      return new AppError("you can only delete your own blogs",400)
+    }
+
+    // soft delete
+    blog.isDeleted = true;
+    blog.deleteAt = new Date()
+    await blog.save()
+
+    return{messge:"Blog deleted successfully", deletedBlog:blog}
+}
 }
 
 export default BlogService;

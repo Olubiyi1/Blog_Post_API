@@ -1,4 +1,4 @@
-import userSchema from "../User/user.model.js"
+import userSchema from "../User/user.model.js";
 import AppError from "../errorHandlers/appError.js";
 import hashPassword from "../guards/hashPassword.js";
 import createJwt from "../guards/createJwt.js";
@@ -6,8 +6,6 @@ import comparePassword from "../guards/comparePassword.js";
 
 class UserService {
 
-    // register user
-    
   static registerUser = async (data) => {
     const { firstName, lastName, email, password } = data;
 
@@ -22,43 +20,37 @@ class UserService {
       firstName,
       lastName,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     return {
       id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email
+      email: user.email,
     };
   };
 
-//   user login
   static loginUser = async (data) => {
     const { email, password } = data;
 
-    console.log('attempted loging with', {email,password});
-    
+    console.log("attempted loging with", { email, password });
 
     const user = await userSchema.findOne({ email });
 
-    console.log("user found", user?"yes":"no");
-    
     if (!user) {
       throw new AppError("Invalid email or password", 401);
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
 
-    console.log("is password same", isPasswordValid);
-    
     if (!isPasswordValid) {
       throw new AppError("Invalid email or password", 401);
     }
 
     const token = createJwt({
       userId: user._id,
-      email: user.email
+      email: user.email,
     });
 
     return {
@@ -67,8 +59,8 @@ class UserService {
         id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email
-      }
+        email: user.email,
+      },
     };
   };
 }

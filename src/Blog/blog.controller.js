@@ -65,19 +65,35 @@ class BlogController {
   //   get all blogs (unprotected)
   static getAllBlogs = async (req, res, next) => {
     try {
-      const { query } = req.query;
+    
 
       // Pass all query params directly to the service
-      const result = await BlogService.getAllPublishedBlogs(query);
+      const result = await BlogService.getAllPublishedBlogs(req.query);
+  
       return ResponseHandler.ok(
         res,
         "Published blogs retrieved successfully",
         result,
       );
+      
+      
     } catch (error) {
       next(error);
     }
   };
-}
+  static deleteBlog = async(req,res,next)=>{
+    try{
+      const {id} = req.params
+      const userId = req.user._id
 
+      const result = await BlogService.deleteBlog(id,userId)
+
+      return ResponseHandler.ok(res,"blog deleted successfully",result)
+
+    }
+    catch(error){
+      next(error)
+    }
+  }
+}
 export default BlogController;

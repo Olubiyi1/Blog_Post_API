@@ -9,7 +9,9 @@ const blogSchema = new mongoose.Schema(
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     state: { type: String, enum: ["draft", "published"], default: "draft" },
     readCount: { type: Number, default: 0 },
-    readingTime: { type: Number }
+    readingTime: { type: Number },
+    deletedAt:{type:Date,default:null},
+    isDeleted:{type:Boolean,default:false}
   },
   { timestamps: true }
 );
